@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Образовательная викторина</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        body {
+            background-color: #f0f8ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .game-container {
+            width: 100%;
+            max-width: 600px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .instructions {
+            background-color: #e8f4fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        select, button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        select {
+            flex: 1;
+            background-color: #ecf0f1;
+            color: #2c3e50;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .question {
+            min-height: 80px;
+            padding: 20px;
+            background-color: #fff;
+            border: 2px dashed #3498db;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 18px;
+            color: #2c3e50;
+        }
+        .answers {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .answer-btn {
+            padding: 15px;
+            background-color: #ecf0f1;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.3s;
+        }
+        .answer-btn:hover {
+            background-color: #3498db;
+            color: white;
+        }
+        .score-timer {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .high-scores {
+            background-color: #d4edda;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        @media (max-width: 480px) {
+            .answers {
+                grid-template-columns: 1fr;
+            }
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Образовательная викторина</h1>
+
+        <div class="instructions">
+            <p><strong>Правила игры:</strong></p>
+            <ol>
+                <li>Выберите уровень сложности.</li>
+                <li>Отвечайте на вопросы за отведённое время.</li>
+                <li>За каждый правильный ответ вы получаете 10 очков.</li>
+                <li>Чем выше уровень сложности, тем больше вопросов и меньше времени.</li>
+                <li>После игры ваш результат сохранится в таблице рекордов.</li>
+            </ol>
+        </div>
+
+        <div class="controls">
+            <select id="difficulty">
+                <option value="easy">Лёгкий (5 вопросов, 30 сек)</option>
+                <option value="medium">Средний (10 вопросов, 20 сек)</option>
+                <option value="hard">Сложный (15 вопросов, 15 сек)</option>
+            </select>
+            <button onclick="startGame()">Начать игру</button>
+        </div>
+
+        <div id="question" class="question">Выберите уровень и нажмите «Начать игру»</div>
+
+        <div id="answers" class="answers"></div>
+
+        <div class="score-timer">
+            <div>Счёт: <span id="score">0</span></div>
+            <div>Время: <span id="timer">00:00</span></div>
+            <div>Вопрос: <span id="question-num">0/0</span></div>
+        </div>
+
+        <div id="high-scores" class="high-scores">
+            <strong>Лучшие результаты:</strong>
+            <ul id="scores-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        const questions = {
+            easy: [
+                { q: 'Сколько планет в Солнечной системе?', a: ['8', '9', '7', '10'], correct: 0 },
+                { q: 'Какой химический элемент обозначается символом O?', a: ['Кислород', 'Озон', 'Осмий', 'Олово'], correct: 0 },
+                { q: 'Кто написал «Евгений Онегин»?', a: ['Пушкин', 'Лермонтов', 'Гоголь', 'Толстой'], correct: 0 }
+            ],
+            medium: [
+                { q: 'В каком году человек впервые ступил на Луну?', a: ['1969', '1971', '1965', '1973'], correct: 0 },
+                { q: 'Какая самая большая река в мире?', a: ['Амазонка', 'Нил', 'Миссисипи', 'Янцзы'], correct: 0 },
+                { q: 'Кто открыл закон всемирного тяготения?', a: ['Ньютон', 'Эйнштейн', 'Галилей', 'Кеплер'], correct: 0 },
+                { q: 'Какое животное является самым крупным на Земле?', a: ['Синий кит', 'Африканский слон', 'Кашалот', 'Белый носорог'], correct: 0 },
+                { q: 'Как называется столица Японии?', a: ['Токио', 'Киото', 'Осака', 'Нагоя'], correct: 0 }
+            ],
+            hard: [
+                { q: 'Кто сформулировал теорию относительности?', a: ['Эйнштейн', 'Ньютон', 'Планк', 'Бор'], correct: 0 },
+                { q: 'Какая страна имеет самую большую площадь?', a: ['Россия', 'Канада', 'США', 'Китай'], correct: 0 },
+                { q: 'Как называется процесс фотосинтеза у растений?', a: ['Фотосинтез', 'Дыхание', 'Транспирация', 'Гликолиз'], correct: 0 },
+                { q: 'Кто написал картину «Звёздная ночь»?', a: ['Ван Гог', 'Моне', 'Пикассо', 'Рембрандт'], correct: 0 },
+                { q: 'Какой элемент является основным в органической химии?', a: ['Углерод', 'Кислород', 'Водород', 'Азот'], correct: 0 },
+                { q: 'Кто изобрёл телефон?', a: ['Белл', 'Морзе', 'Тесла', 'Маркони'], correct: 0 },
+                { q: 'Какая планета известна как «Красная планета»?', a: ['Марс', 'Венера', 'Юпитер', 'Сатурн'], correct: 0            ],
+            { q: 'Какое море самое солёное на Земле?', a: ['Мёртвое', 'Красное', 'Средиземное', 'Каспийское'], correct: 0 }
+        ]
+    };
+
+    let currentDifficulty = 'easy';
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let timer;
+    let timeLeft;
+
+    const difficultySettings = {
+        easy: { questions: 5, time: 30 },
+        medium: { questions: 10, time: 20 },
+        hard: { questions: 15, time: 15 }
+    };
+
+    // Загрузка рекордов из localStorage
+    function loadHighScores() {
+        const scores = JSON.parse(localStorage.getItem('highScores')) || [];
+        const scoresList = document.getElementById('scores-list');
+        scoresList.innerHTML = '';
+        scores.forEach(score => {
+            const li = document.createElement('li');
+            li.textContent = `${score.difficulty}: ${score.score} очков (${score.date})`;
+            scoresList.appendChild(li);
+        });
+    }
+
+    // Сохранение рекорда
+    function saveHighScore(difficulty, score) {
+        const scores = JSON.parse(localStorage.getItem('highScores')) || [];
+        scores.push({
+            difficulty,
+            score,
+            date: new Date().toLocaleDateString('ru-RU')
+        });
+        // Сортировка по убыванию очков
+        scores.sort((a, b) => b.score - a.score);
+        // Оставляем только 5 лучших результатов
+        localStorage.setItem('highScores', JSON.stringify(scores.slice(0, 5)));
+        loadHighScores();
+    }
+
+    // Запуск игры
+    function startGame() {
+        currentDifficulty = document.getElementById('difficulty').value;
+        const settings = difficultySettings[currentDifficulty];
+        currentQuestionIndex = 0;
+        score = 0;
+        timeLeft = settings.time;
+
+        document.getElementById('score').textContent = score;
+        document.getElementById('timer').textContent = formatTime(timeLeft);
+        document.getElementById('question-num').textContent = `${currentQuestionIndex + 1}/${settings.questions}`;
+
+        showQuestion();
+        startTimer();
+    }
+
+    // Отображение вопроса
+    function showQuestion() {
+        const questionData = questions[currentDifficulty][currentQuestionIndex];
+        document.getElementById('question').textContent = questionData.q;
+
+        const answersContainer = document.getElementById('answers');
+        answersContainer.innerHTML = '';
+
+        questionData.a.forEach((answer, index) => {
+            const button = document.createElement('button');
+            button.className = 'answer-btn';
+            button.textContent = answer;
+            button.onclick = () => checkAnswer(index);
+            answersContainer.appendChild(button);
+        });
+    }
+
+    // Проверка ответа
+    function checkAnswer(selectedIndex) {
+        const questionData = questions[currentDifficulty][currentQuestionIndex];
+        if (selectedIndex === questionData.correct) {
+            score += 10;
+            document.getElementById('score').textContent = score;
+            // Анимация правильного ответа
+            document.querySelectorAll('.answer-btn').forEach(btn => {
+                if (btn.textContent === questionData.a[questionData.correct]) {
+                    btn.style.backgroundColor = '#27ae60';
+                    btn.style.color = 'white';
+                }
+            });
+        } else {
+            // Анимация неправильного ответа
+            document.querySelectorAll('.answer-btn').forEach(btn => {
+                if (btn.textContent === questionData.a[selectedIndex]) {
+                    btn.style.backgroundColor = '#e74c3c';
+                    btn.style.color = 'white';
+                }
+                if (btn.textContent === questionData.a[questionData.correct]) {
+                    btn.style.backgroundColor = '#27ae60';
+                    btn.style.color = 'white';
+                }
+            });
+        }
+
+        setTimeout(() => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < difficultySettings[currentDifficulty].questions) {
+                showQuestion();
+                timeLeft = difficultySettings[currentDifficulty].time;
+                document.getElementById('timer').textContent = formatTime(timeLeft);
+                document.getElementById('question-num').textContent = `${currentQuestionIndex + 1}/${difficultySettings[currentDifficulty].questions}`;
+            } else {
+                endGame();
+            }
+        }, 1000);
+    }
+
+    // Таймер
+    function startTimer() {
+        timer = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer').textContent = formatTime(timeLeft);
+
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                endGame();
+            }
+        }, 1000);
+    }
+
+    // Формат времени (мм:сс)
+    function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs < 10 ? '0' + secs : secs}`;
+    }
+
+    // Конец игры
+    function endGame() {
+        clearInterval(timer);
+        document.getElementById('question').textContent = 'Игра окончена!';
+        document.getElementById('answers').innerHTML = `<button onclick="startGame()">Играть снова</button>`;
+
+        saveHighScore(currentDifficulty, score);
+
+        alert(`Игра окончена! Ваш результат: ${score} очков.`);
+    }
+
+    // Инициализация
+    window.onload = function() {
+        loadHighScores();
+    };
+    </script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест: Теорема Пифагора</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f4f6f9; }
+        .container { max-width: 700px; margin: 20px auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .progress { height: 10px; background: #e0e0e0; border-radius: 5px; margin: 20px 0; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0; background: #4caf50; transition: width 0.3s; }
+        .question { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .options { margin: 15px 0; }
+        .options label { display: block; margin: 8px 0; cursor: pointer; }
+        input[type="text"] { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #4caf50; color: white; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 10px 5px; }
+        button:hover { background: #45a049; }
+        .result { padding: 20px; background: #e8f5e9; border-left: 4px solid #4caf50; margin: 20px 0; display: none; }
+        .feedback { font-weight: bold; margin: 10px 0; }
+        .correct { color: #2e7d32; }
+        .incorrect { color: #c62828; }
+        @media (max-width: 600px) { .container { padding: 10px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Тест: Теорема Пифагора</h1>
+            <p>Ответьте на 10 вопросов</p>
+        </div>
+
+        <div class="progress">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+
+        <div id="test"></div>
+
+        <button onclick="prevQuestion()">Назад</button>
+        <button onclick="nextQuestion()">Далее</button>
+        <button onclick="submitTest()" id="submitBtn">Завершить тест</button>
+
+        <div id="results" class="result"></div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Чему равен квадрат гипотенузы в прямоугольном треугольнике?",
+                type: "radio",
+                options: ["Сумме квадратов катетов", "Произведению катетов", "Сумме катетов"],
+                answer: 0
+            },
+            {
+                question: "Если катеты равны 3 и 4, чему равна гипотенуза?",
+                type: "text",
+                answer: "5"
+            },
+            {
+                question: "Какие из наборов чисел могут быть сторонами прямоугольного треугольника?",
+                type: "checkbox",
+                options: ["5, 12, 13", "6, 8, 10", "7, 9, 12"],
+                answer: [0, 1]
+            },
+            // ... ещё 7 вопросов (для краткости опущены)
+        ];
+
+        let currentQ = 0;
+        let score = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+
+        function renderQuestion() {
+            const q = questions[currentQ];
+            document.getElementById("test").innerHTML = `
+                <div class="question">
+                    <h3>Вопрос ${currentQ + 1}:</h3>
+                    <p>${q.question}</p>
+                    <div class="options">
+                        ${q.type === "radio" ?
+                            q.options.map((opt, i) => `
+                                <label><input type="radio" name="q" value="${i}" ${userAnswers[currentQ] === i ? "checked" : ""}> ${opt}</label>
+                            `).join("") :
+                        q.type === "checkbox" ?
+                            q.options.map((opt, i) => `
+                                <label><input type="checkbox" value="${i}" ${Array.isArray(userAnswers[currentQ]) && userAnswers[currentQ].includes(i) ? "checked" : ""}> ${opt}</label>
+                            `).join("") :
+                        `<input type="text" id="textAnswer" value="${userAnswers[currentQ] || ""}">`
+                        }
+                    </div>
+                </div>
+            `;
+            updateProgress();
+        }
+
+        function getUserAnswer() {
+            const q = questions[currentQ];
+            if (q.type === "radio") {
+                const selected = document.querySelector('input[name="q"]:checked');
+                return selected ? parseInt(selected.value) : null;
+            } else if (q.type === "checkbox") {
+                const checked = document.querySelectorAll('input[type="checkbox"]:checked');
+                return Array.from(checked).map(el => parseInt(el.value));
+            } else {
+                return document.getElementById("textAnswer").value.trim();
+            }
+        }
+
+        function nextQuestion() {
+            const ans = getUserAnswer();
+            if (ans === null) {
+                alert("Пожалуйста, ответьте на вопрос!");
+                return;
+            }
+            userAnswers[currentQ] = ans;
+            if (currentQ < questions.length - 1) {
+                currentQ++;
+                renderQuestion();
+            } else {
+                submitTest();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQ > 0) {
+                currentQ--;
+                renderQuestion();
+            }
+        }
+
+        function updateProgress() {
+            const percent = ((currentQ + 1) / questions.length) * 100;
+            document.getElementById("progress").style.width = percent + "%";
+        }
+
+        function submitTest() {
+            let correct = 0;
+            questions.forEach((q, i) => {
+                const userAns = userAnswers[i];
+                if (Array.isArray(q.answer)) {
+                    if (JSON.stringify(userAns) === JSON.stringify(q.answer)) correct++;
+                } else if (userAns == q.answer) correct++;
+            });
+            score = correct;
+
+            const resultsHTML = `
+                <h3>Результаты теста</h3>
+                <p>Правильных ответов: ${score} из ${questions.length}</p>
+                <p>Процент: ${Math.round((score / questions.length) * 100)}%</p>
+                <div>
+                    ${questions.map((q, i) => `
+                        <div>
+                            <strong>Вопрос ${i+1}:</strong> ${q.question}<br>
+                            Ваш ответ: ${userAnswers[i] || "не дан"}<br>
+                            Правильный ответ: ${Array.isArray(q.answer) ? q.answer.join(", ") : q.answer}<br>
+                            ${userAnswers[i] && ((Array.isArray(q.answer) && JSON.stringify(userAnswers[i]) === JSON.stringify(q.answer)) || userAnswers[i] == q.answer) ?
+                                '<span class="correct">Правильно!</span>' :
+                                '<span class="incorrect">Неправильно.</span>'
+                            }
+                        </div><hr>
+                    `).join("")}
+                </div>
+                            <button onclick="location.reload()">Пройти заново</button>
+            `;
+
+            document.getElementById("results").innerHTML = resultsHTML;
+            document.getElementById("results").style.display = "block";
+            document.querySelector(".progress").style.display = "none";
+            document.querySelectorAll("button").forEach(btn => btn.style.display = "none");
+        }
+
+        // Инициализация
+        renderQuestion();
+    </script>
+</body>
+</html>

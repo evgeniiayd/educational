@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Урок: Квадратные уравнения</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+        }
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+        }
+        nav {
+            background: white;
+            padding: 1rem;
+            border-bottom: 1px solid #ddd;
+        }
+        nav ul {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            gap: 2rem;
+        }
+        nav a {
+            color: #2c3e50;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s, transform 0.2s;
+        }
+        nav a:hover {
+            color: #3498db;
+            transform: scale(1.05);
+        }
+        main {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #2980b9;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .definition {
+            background: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 1rem;
+            border-radius: 4px;
+        }
+        .example {
+            border-left: 4px solid #27ae60;
+            background: #f1f8e9;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1.2rem 0;
+        }
+        .task {
+            border: 2px dashed #f39c12;
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin: 1.2rem 0;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 0.7rem 1.4rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+            transition: background 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        .answer {
+            display: none;
+            padding: 1rem;
+            background: #d4edda;
+            border-left: 4px solid #27ae60;
+            border-radius: 4px;
+            margin-top: 1rem;
+        }
+        .answer.show {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background: #2c3e50;
+            color: white;
+            font-size: 0.9rem;
+        }
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: center;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📘 Квадратные уравнения</h1>
+        <p>Алгебра, 8 класс</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#theory">Теория</a></li>
+            <li><a href="#examples">Примеры</a></li>
+            <li><a href="#tasks">Задания</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="theory">
+            <h2>📚 Теория</h2>
+            <div class="definition">
+                <h3>Что такое квадратное уравнение?</h3>
+                <p>
+                    Квадратное уравнение имеет вид: $ax^{2} + bx + c = 0$, где:
+                </p>
+                <ul>
+                    <li>$a$ — коэффициент при $x^{2}$ ($a \neq 0$);</li>
+                    <li>$b$ — коэффициент при $x$;</li>
+                    <li>$c$ — свободный член.</li>
+                </ul>
+            </div>
+
+            <h3>Формула дискриминанта</h3>
+            <p>
+                Дискриминант $D$ вычисляется по формуле: $D = b^{2} - 4ac$.
+            </p>
+            <p>От значения $D$ зависит число корней:</p>
+            <ul>
+                <li>Если $D > 0$ — два различных корня;</li>
+                <li>Если $D = 0$ — один корень (или два совпадающих);</li>
+                <li>Если $D < 0$ — нет действительных корней.</li>
+            </ul>
+        </section>
+
+        <section id="examples">
+            <h2>💡 Примеры</h2>
+
+            <div class="example">
+                <h3>Пример 1: Решение уравнения</h3>
+                <p><strong>Уравнение:</strong> $x^{2} - 5x + 6 = 0$</p>
+                <p><strong>Решение:</strong></p>
+                <pre>
+$a = 1$, $b = -5$, $c = 6$
+$D = (-5)^{2} - 4 \cdot 1 \cdot 6 = 25 - 24 = 1$
+$x_{1} = \frac{5 + \sqrt{1}}{2} = 3$
+$x_{2} = \frac{5 - \sqrt{1}}{2} = 2$
+                </pre>
+                <p><strong>Ответ:</strong> $x_1 = 3$, $x_2 = 2$.</p>
+            </div>
+
+            <div class="example">
+                <h3>Пример 2: Уравнение с одним корнем</h3>
+                <p><strong>Уравнение:</strong> $x^{2} - 6x + 9 = 0$</p>
+                <p><strong>Решение:</strong></p>
+                <pre>
+$a = 1$, $b = -6$, $c = 9$
+$D = (-6)^{2} - 4 \cdot 1 \cdot 9 = 36 - 36 = 0$
+$x = \frac{6}{2} = 3$
+                </pre>
+                <p><strong>Ответ:</strong> $x = 3$ (один корень).</p>
+            </div>
+        </section>
+
+        <section id="tasks">
+            <h2>✏️ Задания для самопроверки</h2>
+
+                        <div class="task">
+                <h3>Задание 1</h3>
+                <p>Решите уравнение: $x^{2} - 7x + 10 = 0$</p>
+                <button onclick="toggleAnswer('ans1')">Показать ответ</button>
+                <div id="ans1" class="answer">
+                    <p><strong>Решение:</strong></p>
+                    <pre>
+$a = 1$, $b = -7$, $c = 10$
+$D = (-7)^{2} - 4 \cdot 1 \cdot 10 = 49 - 40 = 9$
+$x_{1} = \frac{7 + \sqrt{9}}{2} = \frac{10}{2} = 5$
+$x_{2} = \frac{7 - \sqrt{9}}{2} = \frac{4}{2} = 2$
+                    </pre>
+                    <p><strong>Ответ:</strong> $x_1 = 5$, $x_2 = 2$.</p>
+                </div>
+            </div>
+
+            <div class="task">
+                <h3>Задание 2</h3>
+                <p>Найдите корни уравнения: $2x^{2} - 8x + 6 = 0$</p>
+                <button onclick="toggleAnswer('ans2')">Показать ответ</button>
+                <div id="ans2" class="answer">
+                    <p><strong>Решение:</strong></p>
+                    <pre>
+$a = 2$, $b = -8$, $c = 6$
+$D = (-8)^{2} - 4 \cdot 2 \cdot 6 = 64 - 48 = 16$
+$x_{1} = \frac{8 + \sqrt{16}}{4} = \frac{12}{4} = 3$
+$x_{2} = \frac{8 - \sqrt{16}}{4} = \frac{4}{4} = 1$
+                    </pre>
+                    <p><strong>Ответ:</strong> $x_1 = 3$, $x_2 = 1$.</p>
+                </div>
+            </div>
+
+            <div class="task">
+                <h3>Задание 3</h3>
+                <p>Определите, имеет ли уравнение корни: $x^{2} - 4x + 5 = 0$</p>
+                <button onclick="toggleAnswer('ans3')">Показать ответ</button>
+                <div id="ans3" class="answer">
+                    <p><strong>Решение:</strong></p>
+                    <pre>
+$a = 1$, $b = -4$, $c = 5$
+$D = (-4)^{2} - 4 \cdot 1 \cdot 5 = 16 - 20 = -4$
+Так как $D < 0$, уравнение не имеет действительных корней.
+                    </pre>
+                    <p><strong>Ответ:</strong> нет действительных корней.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Учитель математики | © 2024</p>
+        <p>Для обратной связи: teacher@school.ru</p>
+    </footer>
+
+    <script>
+        function toggleAnswer(id) {
+            const answer = document.getElementById(id);
+            if (answer.classList.contains('show')) {
+                answer.classList.remove('show');
+            } else {
+                answer.classList.add('show');
+            }
+        }
+    </script>
+</body>
+</html>
